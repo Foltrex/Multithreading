@@ -6,4 +6,8 @@ public class Dollar extends Money {
         super(banknotes, coins);
     }
 
+    @Override
+    public String toString() {
+        return super.toString() + " USD";
+    }
 }

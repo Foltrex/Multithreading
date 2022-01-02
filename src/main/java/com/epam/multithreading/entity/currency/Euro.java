@@ -5,4 +5,9 @@ public class Euro extends Money {
     public Euro(int banknotes, int coins) {
         super(banknotes, coins);
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + " EUR";
+    }
 }

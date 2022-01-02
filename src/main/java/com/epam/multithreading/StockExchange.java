@@ -1,45 +1,102 @@
 package com.epam.multithreading;
 
 import com.epam.multithreading.entity.Participant;
+import com.epam.multithreading.exception.TransactionException;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class StockExchange {
     private static final StockExchange instance = new StockExchange();
-    private Queue<Participant> participants = new LinkedList<>();
-    private Lock lock = new ReentrantLock();
-    private Condition notEmpty = lock.newCondition();
+
+    private static final int STOCK_EXCHANGE_PARTICIPANTS_CAPACITY = 10;
+
+    private final Semaphore semaphore = new Semaphore(STOCK_EXCHANGE_PARTICIPANTS_CAPACITY);
+    private final Queue<Participant> participants = new LinkedList<>();
+    private final Lock lock = new ReentrantLock();
+    private final Lock queueLock = new ReentrantLock();
+    private final Condition notEmpty = queueLock.newCondition();
+
 
     private StockExchange() {}
 
 
-    private void put(Participant participant) {
+    public void process(Participant participant) throws InterruptedException, TransactionException {
+        semaphore.acquire();
         lock.lock();
+        try {
+            if (!isEmpty()) {
+                for (Participant otherParticipant: participants) {
+                    participant.exchange(otherParticipant);
+                }
+
+                TimeUnit.MILLISECONDS.sleep(100);
+            }
+
+            put(participant);
+        } finally {
+            lock.unlock();
+            semaphore.release();
+        }
+    }
+
+
+    private void put(Participant participant) throws InterruptedException {
+        queueLock.lock();
         try {
             participants.add(participant);
             notEmpty.signal();
         } finally {
-            lock.unlock();
+            queueLock.unlock();
         }
     }
 
-    public void process(Participant participant) {
-
-    }
-
     private Participant take() throws InterruptedException {
-        lock.lock();
+        queueLock.lock();
         try {
             while (participants.isEmpty()) {
                 notEmpty.await();
             }
+
             return participants.remove();
         } finally {
-            lock.unlock();
+            queueLock.unlock();
+        }
+    }
+
+    private int size() {
+        queueLock.lock();
+        try {
+            return participants.size();
+        } finally {
+            queueLock.unlock();
+        }
+    }
+
+    private boolean isEmpty() {
+        queueLock.lock();
+        try {
+            return participants.isEmpty();
+        } finally {
+            queueLock.unlock();
+        }
+    }
+
+    private Participant element() throws InterruptedException {
+        queueLock.lock();
+        try {
+            while (participants.isEmpty()) {
+                notEmpty.await();
+            }
+
+            return participants.element();
+        } finally {
+            queueLock.unlock();
         }
     }
 

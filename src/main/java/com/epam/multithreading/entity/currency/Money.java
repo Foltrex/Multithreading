@@ -31,4 +31,9 @@ public abstract class Money implements Comparable<Money> {
         int totalOtherCoins = otherMoney.getBanknote() * 100 + otherMoney.getCoins();
         return Integer.compare(totalCoins, totalOtherCoins);
     }
+
+    @Override
+    public String toString() {
+        return banknotes + "." + coins;
+    }
 }
