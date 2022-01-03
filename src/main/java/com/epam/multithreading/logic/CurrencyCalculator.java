@@ -11,7 +11,7 @@ public class CurrencyCalculator {
 
     public static Money add(Money firstMoney, Money secondMoney) throws TransactionException {
         int firstAndSecondCoins = firstMoney.getCoins() + secondMoney.getCoins();
-        int firstAndSecondBanknote = firstMoney.getBanknote() + secondMoney.getBanknote();
+        int firstAndSecondBanknote = firstMoney.getBanknotes() + secondMoney.getBanknotes();
 
         int totalBanknote = firstAndSecondBanknote + firstAndSecondCoins / 100;
         int totalCoins = firstAndSecondCoins % 100;
@@ -31,8 +31,8 @@ public class CurrencyCalculator {
     }
 
     public static Money subtract(Money firstMoney, Money secondMoney) throws TransactionException {
-        int totalFirstMoneyCoins = firstMoney.getBanknote() * 100 + firstMoney.getCoins();
-        int totalSecondMoneyCoins = secondMoney.getBanknote() * 100 + secondMoney.getCoins();
+        int totalFirstMoneyCoins = firstMoney.getBanknotes() * 100 + firstMoney.getCoins();
+        int totalSecondMoneyCoins = secondMoney.getBanknotes() * 100 + secondMoney.getCoins();
 
         int resultCoins = totalFirstMoneyCoins - totalSecondMoneyCoins;
 

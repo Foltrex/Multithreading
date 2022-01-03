@@ -14,9 +14,9 @@ import java.util.concurrent.locks.ReentrantLock;
 public class StockExchange {
     private static final StockExchange instance = new StockExchange();
 
-    private static final int STOCK_EXCHANGE_PARTICIPANTS_CAPACITY = 10;
+//    private static final int STOCK_EXCHANGE_PARTICIPANTS_CAPACITY = 10;
 
-    private final Semaphore semaphore = new Semaphore(STOCK_EXCHANGE_PARTICIPANTS_CAPACITY);
+//    private final Semaphore semaphore = new Semaphore(STOCK_EXCHANGE_PARTICIPANTS_CAPACITY);
     private final Queue<Participant> participants = new LinkedList<>();
     private final Lock lock = new ReentrantLock();
     private final Lock queueLock = new ReentrantLock();
@@ -27,76 +27,21 @@ public class StockExchange {
 
 
     public void process(Participant participant) throws InterruptedException, TransactionException {
-        semaphore.acquire();
+//        semaphore.acquire();
         lock.lock();
         try {
-            if (!isEmpty()) {
-                for (Participant otherParticipant: participants) {
-                    participant.exchange(otherParticipant);
-                }
-
-                TimeUnit.MILLISECONDS.sleep(100);
+            for (Participant otherParticipant: participants) {
+                participant.exchange(otherParticipant);
             }
 
-            put(participant);
+            participants.add(participant);
+            //System.out.println(participants + "\n");
+
+            // time between other deal in stock exchage
+            TimeUnit.MILLISECONDS.sleep(800);
         } finally {
             lock.unlock();
-            semaphore.release();
-        }
-    }
-
-
-    private void put(Participant participant) throws InterruptedException {
-        queueLock.lock();
-        try {
-            participants.add(participant);
-            notEmpty.signal();
-        } finally {
-            queueLock.unlock();
-        }
-    }
-
-    private Participant take() throws InterruptedException {
-        queueLock.lock();
-        try {
-            while (participants.isEmpty()) {
-                notEmpty.await();
-            }
-
-            return participants.remove();
-        } finally {
-            queueLock.unlock();
-        }
-    }
-
-    private int size() {
-        queueLock.lock();
-        try {
-            return participants.size();
-        } finally {
-            queueLock.unlock();
-        }
-    }
-
-    private boolean isEmpty() {
-        queueLock.lock();
-        try {
-            return participants.isEmpty();
-        } finally {
-            queueLock.unlock();
-        }
-    }
-
-    private Participant element() throws InterruptedException {
-        queueLock.lock();
-        try {
-            while (participants.isEmpty()) {
-                notEmpty.await();
-            }
-
-            return participants.element();
-        } finally {
-            queueLock.unlock();
+//            semaphore.release();
         }
     }
 

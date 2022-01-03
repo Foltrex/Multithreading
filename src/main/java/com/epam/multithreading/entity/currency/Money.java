@@ -4,16 +4,19 @@ public abstract class Money implements Comparable<Money> {
     private int banknotes;
     private int coins;
 
+    public Money() {
+    }
+
     public Money(int banknotes, int coins) {
         this.banknotes = banknotes;
         this.coins = coins;
     }
 
-    public int getBanknote() {
+    public int getBanknotes() {
         return banknotes;
     }
 
-    public void setBanknote(int banknotes) {
+    public void setBanknotes(int banknotes) {
         this.banknotes = banknotes;
     }
 
@@ -28,7 +31,7 @@ public abstract class Money implements Comparable<Money> {
     @Override
     public int compareTo(Money otherMoney) {
         int totalCoins = banknotes * 100 + coins;
-        int totalOtherCoins = otherMoney.getBanknote() * 100 + otherMoney.getCoins();
+        int totalOtherCoins = otherMoney.getBanknotes() * 100 + otherMoney.getCoins();
         return Integer.compare(totalCoins, totalOtherCoins);
     }
 

@@ -1,0 +1,91 @@
+[
+  {
+    "belarusianRuble": {
+      "banknotes": 3220,
+      "coins": 65
+    },
+    "euro": {
+      "banknotes": 100,
+      "coins": 40
+    },
+    "dollar": {
+      "banknotes": 120,
+      "coins": 87
+    }
+  },
+
+  {
+    "belarusianRuble": {
+      "banknotes": 4770,
+      "coins": 28
+    },
+    "euro": {
+      "banknotes": 200,
+      "coins": 34
+    },
+    "dollar": {
+      "banknotes": 20,
+      "coins": 8
+    }
+  },
+
+  {
+    "belarusianRuble": {
+      "banknotes": 1320,
+      "coins": 53
+    },
+    "euro": {
+      "banknotes": 222,
+      "coins": 22
+    },
+    "dollar": {
+      "banknotes": 327,
+      "coins": 41
+    }
+  },
+
+  {
+    "belarusianRuble": {
+      "banknotes": 7000,
+      "coins": 65
+    },
+    "euro": {
+      "banknotes": 1000,
+      "coins": 0
+    },
+    "dollar": {
+      "banknotes": 100,
+      "coins": 12
+    }
+  },
+
+  {
+    "belarusianRuble": {
+      "banknotes": 3212,
+      "coins": 6
+    },
+    "euro": {
+      "banknotes": 10,
+      "coins": 4
+    },
+    "dollar": {
+      "banknotes": 12,
+      "coins": 8
+    }
+  },
+
+  {
+    "belarusianRuble": {
+      "banknotes": 8499,
+      "coins": 78
+    },
+    "euro": {
+      "banknotes": 65,
+      "coins": 32
+    },
+    "dollar": {
+      "banknotes": 990,
+      "coins": 87
+    }
+  }
+]

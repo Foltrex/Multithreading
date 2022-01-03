@@ -8,13 +8,23 @@ import com.epam.multithreading.exception.TransactionException;
 import com.epam.multithreading.logic.CurrencyCalculator;
 import com.epam.multithreading.logic.CurrencyConverter;
 
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+
 public class Participant implements Runnable {
+
+    private CyclicBarrier cyclicBarrier;
+
     private BelarusianRuble belarusianRuble;
     private Euro euro;
     private Dollar dollar;
 
 
-    public Participant(BelarusianRuble belarusianRuble, Euro euro, Dollar dollar) {
+    public Participant() {
+    }
+
+    public Participant(CyclicBarrier cyclicBarrier, BelarusianRuble belarusianRuble, Euro euro, Dollar dollar) {
+        this.cyclicBarrier = cyclicBarrier;
         this.belarusianRuble = belarusianRuble;
         this.euro = euro;
         this.dollar = dollar;
@@ -45,26 +55,32 @@ public class Participant implements Runnable {
         this.dollar = dollar;
     }
 
+    public void setCyclicBarrier(CyclicBarrier cyclicBarrier) {
+        this.cyclicBarrier = cyclicBarrier;
+    }
+
 
     @Override
     public void run() {
         StockExchange stockExchange = StockExchange.getInstance();
         try {
             stockExchange.process(this);
-        } catch (InterruptedException | TransactionException e) {
+
+            cyclicBarrier.await();
+        } catch (InterruptedException | TransactionException | BrokenBarrierException e) {
             System.out.println(e.getMessage());
         }
     }
 
     private static final int MINIMUM_EXCHANGE_AMOUNT = 30;
     public void exchange(Participant otherParticipant) throws TransactionException {
-        if (euro.getBanknote() >= MINIMUM_EXCHANGE_AMOUNT) {
+        if (euro.getBanknotes() >= MINIMUM_EXCHANGE_AMOUNT) {
             sellEuro(otherParticipant);
         } else {
             buyEuro(otherParticipant);
         }
 
-        if (dollar.getBanknote() >= MINIMUM_EXCHANGE_AMOUNT) {
+        if (dollar.getBanknotes() >= MINIMUM_EXCHANGE_AMOUNT) {
             sellDollar(otherParticipant);
         } else {
             buyDollar(otherParticipant);
@@ -164,10 +180,10 @@ public class Participant implements Runnable {
 
     @Override
     public String toString() {
-        return "Participant{" +
-                "belarusianRuble=" + belarusianRuble +
-                ", euro=" + euro +
-                ", dollar=" + dollar +
-                '}';
+        return "\nParticipant{" +
+                "\tbelarusianRuble=" + belarusianRuble +
+                ",\teuro=" + euro +
+                ",\tdollar=" + dollar +
+                "\t}\n";
     }
 }

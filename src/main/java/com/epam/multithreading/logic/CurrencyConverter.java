@@ -17,7 +17,7 @@ public class CurrencyConverter {
     private CurrencyConverter() {}
 
     public static Euro convertToEuro(Dollar dollar) {
-        double totalCoinsOfDollar = 100 * dollar.getBanknote() + dollar.getCoins();
+        double totalCoinsOfDollar = 100 * dollar.getBanknotes() + dollar.getCoins();
         double totalCoinsOfEuro = totalCoinsOfDollar * DOLLAR_TO_EURO_CONVERSION_RATIO;
 
         int banknotesOfEuro = (int) (totalCoinsOfEuro / 100);
@@ -27,7 +27,7 @@ public class CurrencyConverter {
     }
 
     public static Euro convertToEuro(BelarusianRuble belarusianRuble) {
-        double totalCoinsOfBelarusianRuble = 100 * belarusianRuble.getBanknote() + belarusianRuble.getCoins();
+        double totalCoinsOfBelarusianRuble = 100 * belarusianRuble.getBanknotes() + belarusianRuble.getCoins();
         double totalCoinsOfEuro = totalCoinsOfBelarusianRuble * BELARUSIAN_RUBLE_TO_EURO_CONVERSION_RATIO;
 
         int banknotesOfEuro = (int) (totalCoinsOfEuro / 100);
@@ -38,7 +38,7 @@ public class CurrencyConverter {
 
 
     public static Dollar convertToDollar(Euro euro) {
-        double totalCoinsOfEuro = 100 * euro.getBanknote() + euro.getCoins();
+        double totalCoinsOfEuro = 100 * euro.getBanknotes() + euro.getCoins();
         double totalCoinsOfDollar = totalCoinsOfEuro * EURO_TO_DOLLAR_CONVERSION_RATIO;
 
         int banknotesOfDollar = (int) (totalCoinsOfDollar / 100);
@@ -48,7 +48,7 @@ public class CurrencyConverter {
     }
 
     public static Dollar convertToDollar(BelarusianRuble belarusianRuble) {
-        double totalCoinsOfBelarusianRuble = 100 * belarusianRuble.getBanknote() + belarusianRuble.getCoins();
+        double totalCoinsOfBelarusianRuble = 100 * belarusianRuble.getBanknotes() + belarusianRuble.getCoins();
         double totalCoinsOfDollar = totalCoinsOfBelarusianRuble * BELARUSIAN_RUBLE_TO_DOLLAR_CONVERSION_RATIO;
 
         int banknotesOfDollar = (int) (totalCoinsOfDollar / 100);
@@ -59,7 +59,7 @@ public class CurrencyConverter {
 
 
     public static BelarusianRuble convertToBelarusianRuble(Euro euro) {
-        double totalCoinsOfEuro = 100 * euro.getBanknote() + euro.getCoins();
+        double totalCoinsOfEuro = 100 * euro.getBanknotes() + euro.getCoins();
         double totalCoinsOfBelarusianRuble = totalCoinsOfEuro * EURO_TO_BELARUSIAN_RUBLE_CONVERSION_RATIO;
 
         int banknotesOfDollar = (int) (totalCoinsOfBelarusianRuble / 100);
@@ -69,7 +69,7 @@ public class CurrencyConverter {
     }
 
     public static BelarusianRuble convertToBelarusianRuble(Dollar dollar) {
-        double totalCoinsOfDollar = 100 * dollar.getBanknote() + dollar.getCoins();
+        double totalCoinsOfDollar = 100 * dollar.getBanknotes() + dollar.getCoins();
         double totalCoinsOfBelarusianRuble = totalCoinsOfDollar * DOLLAR_TO_BELARUSIAN_RUBLE_CONVERSION_RATIO;
 
         int banknotesOfDollar = (int) (totalCoinsOfBelarusianRuble / 100);
