@@ -1,90 +1,96 @@
 [
   {
+    "name": "Artem",
     "belarusianRuble": {
-      "banknotes": 3220,
+      "banknotes": 920,
       "coins": 65
     },
     "euro": {
-      "banknotes": 100,
+      "banknotes": 317,
       "coins": 40
     },
     "dollar": {
-      "banknotes": 120,
+      "banknotes": 360,
       "coins": 87
     }
   },
 
   {
+    "name": "Maria",
     "belarusianRuble": {
-      "banknotes": 4770,
+      "banknotes": 921,
       "coins": 28
     },
     "euro": {
-      "banknotes": 200,
+      "banknotes": 318,
       "coins": 34
     },
     "dollar": {
-      "banknotes": 20,
+      "banknotes": 361,
       "coins": 8
     }
   },
 
   {
+    "name": "Nikolay",
     "belarusianRuble": {
-      "banknotes": 1320,
+      "banknotes": 922,
       "coins": 53
     },
     "euro": {
-      "banknotes": 222,
+      "banknotes": 319,
       "coins": 22
     },
     "dollar": {
-      "banknotes": 327,
+      "banknotes": 362,
       "coins": 41
     }
   },
 
   {
+    "name": "Ira",
     "belarusianRuble": {
-      "banknotes": 7000,
+      "banknotes": 923,
       "coins": 65
     },
     "euro": {
-      "banknotes": 1000,
+      "banknotes": 320,
       "coins": 0
     },
     "dollar": {
-      "banknotes": 100,
+      "banknotes": 363,
       "coins": 12
     }
   },
 
   {
+    "name": "Sara",
     "belarusianRuble": {
-      "banknotes": 3212,
+      "banknotes": 920,
       "coins": 6
     },
     "euro": {
-      "banknotes": 10,
+      "banknotes": 317,
       "coins": 4
     },
     "dollar": {
-      "banknotes": 12,
+      "banknotes": 360,
       "coins": 8
     }
   },
 
   {
+    "name": "Dmitriy",
     "belarusianRuble": {
-      "banknotes": 8499,
+      "banknotes": 920,
       "coins": 78
     },
     "euro": {
-      "banknotes": 65,
+      "banknotes": 317,
       "coins": 32
     },
     "dollar": {
-      "banknotes": 990,
+      "banknotes": 360,
       "coins": 87
     }
   }
