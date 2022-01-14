@@ -1,31 +1,34 @@
 package com.epam.multithreading.entity;
 
-import com.epam.multithreading.StockExchange;
-import com.epam.multithreading.entity.currency.Dollar;
-import com.epam.multithreading.entity.currency.Euro;
-import com.epam.multithreading.entity.currency.BelarusianRuble;
-import com.epam.multithreading.entity.currency.Money;
-import com.epam.multithreading.exception.TransactionException;
-import com.epam.multithreading.logic.CurrencyCalculator;
-import com.epam.multithreading.logic.CurrencyConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Random;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Participant implements Runnable {
     private static final Logger LOGGER = LogManager.getLogger(Participant.class);
 
     private String name;
-    private BelarusianRuble belarusianRuble;
-    private Euro euro;
-    private Dollar dollar;
+    private double belarusianRuble;
+    private double euro;
+    private double dollar;
+
+
+    // Currency curses
+    private static final double EURO_TO_BELARUSIAN_RUBLE_CONVERSION_RATIO = 2.908912;
+    private static final double DOLLAR_TO_BELARUSIAN_RUBLE_CONVERSION_RATIO = 2.557521;
+
+    private static final double BELARUSIAN_RUBLE_TO_EURO_CONVERSION_RATIO = 0.343846;
+    private static final double BELARUSIAN_RUBLE_TO_DOLLAR_CONVERSION_RATIO = 0.391003;
+
 
 
     public Participant() {
     }
 
-    public Participant(String name, BelarusianRuble belarusianRuble, Euro euro, Dollar dollar) {
+    public Participant(String name, double belarusianRuble, double euro, double dollar) {
         this.name = name;
         this.belarusianRuble = belarusianRuble;
         this.euro = euro;
@@ -40,217 +43,155 @@ public class Participant implements Runnable {
         this.name = name;
     }
 
-    public BelarusianRuble getBelarusianRuble() {
+    public double getBelarusianRuble() {
         return belarusianRuble;
     }
 
-    public void setBelarusianRuble(BelarusianRuble belarusianRuble) {
+    public void setBelarusianRuble(double belarusianRuble) {
         this.belarusianRuble = belarusianRuble;
     }
 
-    public Euro getEuro() {
+    public double getEuro() {
         return euro;
     }
 
-    public void setEuro(Euro euro) {
+    public void setEuro(double euro) {
         this.euro = euro;
     }
 
-    public Dollar getDollar() {
+    public double getDollar() {
         return dollar;
     }
 
-    public void setDollar(Dollar dollar) {
+    public void setDollar(double dollar) {
         this.dollar = dollar;
     }
-
 
     @Override
     public void run() {
         StockExchange stockExchange = StockExchange.getInstance();
         try {
             stockExchange.process(this);
-        } catch (InterruptedException | TransactionException e) {
-            LOGGER.warn(e.getMessage(), e);
+
+        } catch (InterruptedException ex) {
+            LOGGER.warn(ex.getMessage(), ex);
         }
     }
 
-    private static final int MINIMUM_EXCHANGE_AMOUNT = 400;
-    private static final Random random = new Random();
-    public void exchange(Participant otherParticipant) throws TransactionException {
-        if (euro.getBanknotes() < MINIMUM_EXCHANGE_AMOUNT && dollar.getBanknotes() < MINIMUM_EXCHANGE_AMOUNT) {
-            if (random.nextBoolean()) {
-                buyEuro(otherParticipant);
-            } else {
-                buyDollar(otherParticipant);
-            }
+
+    public void exchangeCurrency(Participant participant) {
+
+        double amountOfBuyingDollars = Math.random() * 400;
+        double amountOfBuyingEuro = Math.random() * 400;
+        double amountOfBuyingBelarusianRubles = Math.random() * 1000;
+
+        if (isEnoughToBuyDollars(participant, amountOfBuyingDollars)) {
+            buyDollars(participant, amountOfBuyingDollars);
         }
 
-        if (euro.getBanknotes() >= MINIMUM_EXCHANGE_AMOUNT) {
-            sellEuro(otherParticipant);
-            buyDollar(otherParticipant);
+        if (isEnoughToBuyEuro(participant, amountOfBuyingEuro)) {
+            buyEuro(participant, amountOfBuyingEuro);
         }
 
-        if (dollar.getBanknotes() >= MINIMUM_EXCHANGE_AMOUNT) {
-            sellDollar(otherParticipant);
-            buyEuro(otherParticipant);
+        if (isEnoughToBuyBelarusianRubles(participant, amountOfBuyingBelarusianRubles)) {
+            buyBelarusianRubles(participant, amountOfBuyingBelarusianRubles);
         }
     }
 
-    private void buyEuro(Participant otherParticipant) throws TransactionException {
-        if (belarusianRuble.getBanknotes() == 0 && belarusianRuble.getCoins() == 0) {
-            LOGGER.info("\n"
-                    + "Operation: convert belarusian ruble" + "\n"
-                    + "Members: " + name + " -- " + otherParticipant.getName() + "\n"
-                    + "Status: refused, because " + name + " doesn't have enough rubles\n");
-            return;
-        }
 
-        Euro convertedBelarusianRubleToEuro = CurrencyConverter.convertToEuro(belarusianRuble);
-        Euro otherParticipantEuro = otherParticipant.getEuro();
+    private boolean isEnoughToBuyDollars(Participant participant, double amountOfBuyingDollars) {
+        double currentAmountOfConvertedDollars = this.getBelarusianRuble() * BELARUSIAN_RUBLE_TO_DOLLAR_CONVERSION_RATIO;
 
-        if (otherParticipantEuro.compareTo(convertedBelarusianRubleToEuro) >= 0) {
-            Euro currentOtherParticipantEuro = (Euro) CurrencyCalculator
-                    .subtract(otherParticipantEuro, convertedBelarusianRubleToEuro);
+        return Double.compare(currentAmountOfConvertedDollars, amountOfBuyingDollars) >= 0 &&
+                Double.compare(participant.getDollar(), amountOfBuyingDollars) >= 0;
+    }
 
-            BelarusianRuble currentOtherParticipantBelarusianRuble = (BelarusianRuble) CurrencyCalculator
-                    .add(otherParticipant.getBelarusianRuble(), belarusianRuble);
+    private boolean isEnoughToBuyEuro(Participant participant, double amountOfBuyingEuro) {
+        double currentAmountOfConvertedEuro = this.getBelarusianRuble() * BELARUSIAN_RUBLE_TO_EURO_CONVERSION_RATIO;
+
+        return Double.compare(currentAmountOfConvertedEuro, amountOfBuyingEuro) >= 0 &&
+                Double.compare(participant.getEuro(), amountOfBuyingEuro) >= 0;
+    }
+
+    private boolean isEnoughToBuyBelarusianRubles(Participant participant, double amountOfBuyingBelarusianRubles) {
+        double dollarsConvertedOnBelarusianRubles = this.getDollar() * DOLLAR_TO_BELARUSIAN_RUBLE_CONVERSION_RATIO;
+        double euroConvertedOnBelarusianRubles = this.getEuro() * EURO_TO_BELARUSIAN_RUBLE_CONVERSION_RATIO;
+
+        return Double.compare(participant.getBelarusianRuble(), amountOfBuyingBelarusianRubles) >= 0 &&
+                (Double.compare(dollarsConvertedOnBelarusianRubles, amountOfBuyingBelarusianRubles) >= 0 ||
+                        Double.compare(euroConvertedOnBelarusianRubles, amountOfBuyingBelarusianRubles) >= 0);
+    }
 
 
-            Euro currentThisEuro = (Euro) CurrencyCalculator.add(euro, convertedBelarusianRubleToEuro);
+    private void buyDollars(Participant participant, double amountOfBuyingDollars) {
+        double dollarsConvertedOnRubles = amountOfBuyingDollars * DOLLAR_TO_BELARUSIAN_RUBLE_CONVERSION_RATIO;
 
-            otherParticipant.setEuro(currentOtherParticipantEuro);
-            otherParticipant.setBelarusianRuble(currentOtherParticipantBelarusianRuble);
+        double thisParticipantRemainingAmountOfBelarusianRubles = this.getBelarusianRuble() - dollarsConvertedOnRubles;
+        double thisParticipantRealAmountOfDollars = this.getDollar() + amountOfBuyingDollars;
 
-            logOperationResultMessage(LOGGER, true, belarusianRuble, convertedBelarusianRubleToEuro,
-                    name, otherParticipant.getName());
+        double otherParticipantRemainingAmountOfDollars = participant.getDollar() - amountOfBuyingDollars;
+        double otherParticipantRealAmountOfBelarusianRubles = participant.getBelarusianRuble() + dollarsConvertedOnRubles;
 
-            setEuro(currentThisEuro);
-            setBelarusianRuble(new BelarusianRuble(0, 0));
+        this.setDollar(thisParticipantRealAmountOfDollars);
+        this.setBelarusianRuble(thisParticipantRemainingAmountOfBelarusianRubles);
+
+        participant.setBelarusianRuble(otherParticipantRealAmountOfBelarusianRubles);
+        participant.setDollar(otherParticipantRemainingAmountOfDollars);
+    }
+
+    private void buyEuro(Participant participant, double amountOfBuyingEuro) {
+        double euroConvertedOnRubles = amountOfBuyingEuro * EURO_TO_BELARUSIAN_RUBLE_CONVERSION_RATIO;
+
+        double thisParticipantRemainingAmountOfBelarusianRubles = this.getBelarusianRuble() - euroConvertedOnRubles;
+        double thisParticipantRealAmountOfEuro = this.getEuro() + amountOfBuyingEuro;
+
+        double otherParticipantRemainingAmountOfEuro = participant.getEuro() - amountOfBuyingEuro;
+        double otherParticipantRealAmountOfBelarusianRubles = participant.getBelarusianRuble() + euroConvertedOnRubles;
+
+        this.setEuro(thisParticipantRealAmountOfEuro);
+        this.setBelarusianRuble(thisParticipantRemainingAmountOfBelarusianRubles);
+
+        participant.setBelarusianRuble(otherParticipantRealAmountOfBelarusianRubles);
+        participant.setEuro(otherParticipantRemainingAmountOfEuro);
+    }
+
+    private void buyBelarusianRubles(Participant participant, double amountOfBuyingBelarusianRubles) {
+        double thisParticipantEuroConvertedOnBelarusianRubles = this.getEuro() * EURO_TO_BELARUSIAN_RUBLE_CONVERSION_RATIO;
+
+        double thisParticipantRemainingAmountOfEuro = this.getEuro();
+        double thisParticipantRemainingAmountOfDollars = this.getDollar();
+
+        double otherParticipantRealAmountOfEuro = participant.getEuro();
+        double otherParticipantRealAmountOfDollars = participant.getDollar();
+
+        // if there is enough euro, then we buy for euro, otherwise we buy for dollars
+        if (Double.compare(thisParticipantEuroConvertedOnBelarusianRubles, amountOfBuyingBelarusianRubles) >= 0) {
+            thisParticipantRemainingAmountOfEuro -= amountOfBuyingBelarusianRubles * BELARUSIAN_RUBLE_TO_EURO_CONVERSION_RATIO;
+            otherParticipantRealAmountOfEuro += amountOfBuyingBelarusianRubles * BELARUSIAN_RUBLE_TO_EURO_CONVERSION_RATIO;
         } else {
-            logOperationResultMessage(LOGGER, false, belarusianRuble, convertedBelarusianRubleToEuro,
-                    name, otherParticipant.getName());
-        }
-    }
-
-    private void sellEuro(Participant otherParticipant) throws TransactionException {
-        BelarusianRuble convertedEuroToBelarusianRuble = CurrencyConverter.convertToBelarusianRuble(euro);
-        BelarusianRuble otherParticipantBelarusianRuble = otherParticipant.getBelarusianRuble();
-
-        if (otherParticipantBelarusianRuble.compareTo(convertedEuroToBelarusianRuble) >= 0) {
-            BelarusianRuble currentOtherParticipantBelarusianRuble = (BelarusianRuble) CurrencyCalculator
-                    .subtract(otherParticipantBelarusianRuble, convertedEuroToBelarusianRuble);
-
-            Euro currentOtherParticipantEuro = (Euro) CurrencyCalculator.add(otherParticipant.getEuro(), euro);
-
-
-            BelarusianRuble currentThisBelarusianRuble = (BelarusianRuble) CurrencyCalculator
-                    .add(belarusianRuble, convertedEuroToBelarusianRuble);
-
-
-            otherParticipant.setBelarusianRuble(currentOtherParticipantBelarusianRuble);
-            otherParticipant.setEuro(currentOtherParticipantEuro);
-
-            logOperationResultMessage(LOGGER, true, euro, convertedEuroToBelarusianRuble,
-                    name, otherParticipant.getName());
-
-            setBelarusianRuble(currentThisBelarusianRuble);
-            setEuro(new Euro(0, 0));
-        } else {
-            logOperationResultMessage(LOGGER, false, euro, convertedEuroToBelarusianRuble,
-                    name, otherParticipant.getName());
-        }
-    }
-
-
-    private void buyDollar(Participant otherParticipant) throws TransactionException {
-        if (belarusianRuble.getBanknotes() == 0 && belarusianRuble.getCoins() == 0) {
-            LOGGER.info("\n"
-                    + "Operation: convert belarusian ruble" + "\n"
-                    + "Members: " + name + " -- " + otherParticipant.getName() + "\n"
-                    + "Status: refused, because " + name + " doesn't have enough rubles\n");
-            return;
+            thisParticipantRemainingAmountOfDollars -= amountOfBuyingBelarusianRubles * BELARUSIAN_RUBLE_TO_DOLLAR_CONVERSION_RATIO;
+            otherParticipantRealAmountOfDollars += amountOfBuyingBelarusianRubles * BELARUSIAN_RUBLE_TO_DOLLAR_CONVERSION_RATIO;
         }
 
-        Dollar convertedBelarusianRubleToDollar = CurrencyConverter.convertToDollar(belarusianRuble);
-        Dollar otherParticipantDollar = otherParticipant.getDollar();
+        double thisParticipantRealAmountOfBelarusianRubles = this.getBelarusianRuble() + amountOfBuyingBelarusianRubles;
+        double otherParticipantRemainingAmountOfBelarusianRubles = participant.getBelarusianRuble() - amountOfBuyingBelarusianRubles;
 
-        if (otherParticipantDollar.compareTo(convertedBelarusianRubleToDollar) >= 0) {
-            Dollar currentOtherParticipantDollar = (Dollar) CurrencyCalculator
-                    .subtract(otherParticipantDollar, convertedBelarusianRubleToDollar);
+        this.setBelarusianRuble(thisParticipantRealAmountOfBelarusianRubles);
+        this.setEuro(thisParticipantRemainingAmountOfEuro);
+        this.setDollar(thisParticipantRemainingAmountOfDollars);
 
-            BelarusianRuble currentOtherParticipantBelarusianRuble = (BelarusianRuble) CurrencyCalculator
-                    .add(otherParticipant.getBelarusianRuble(), belarusianRuble);
-
-
-            Dollar currentThisDollar = (Dollar) CurrencyCalculator.add(dollar, convertedBelarusianRubleToDollar);
-
-            otherParticipant.setDollar(currentOtherParticipantDollar);
-            otherParticipant.setBelarusianRuble(currentOtherParticipantBelarusianRuble);
-
-            logOperationResultMessage(LOGGER, true, belarusianRuble, convertedBelarusianRubleToDollar,
-                    name, otherParticipant.getName());
-
-            setDollar(currentThisDollar);
-            setBelarusianRuble(new BelarusianRuble(0, 0));
-        } else {
-            logOperationResultMessage(LOGGER, false, belarusianRuble, convertedBelarusianRubleToDollar,
-                    name, otherParticipant.getName());
-        }
-    }
-
-    private void sellDollar(Participant otherParticipant) throws TransactionException {
-        BelarusianRuble convertedDollarToBelarusianRuble = CurrencyConverter.convertToBelarusianRuble(dollar);
-        BelarusianRuble otherParticipantBelarusianRuble = otherParticipant.getBelarusianRuble();
-
-        if (otherParticipantBelarusianRuble.compareTo(convertedDollarToBelarusianRuble) >= 0) {
-            BelarusianRuble currentOtherParticipantBelarusianRuble = (BelarusianRuble) CurrencyCalculator
-                    .subtract(otherParticipantBelarusianRuble, convertedDollarToBelarusianRuble);
-
-            Dollar currentOtherParticipantDollar = (Dollar) CurrencyCalculator.add(otherParticipant.getDollar(), dollar);
-
-
-            BelarusianRuble currentThisBelarusianRuble = (BelarusianRuble) CurrencyCalculator
-                    .add(belarusianRuble, convertedDollarToBelarusianRuble);
-
-
-            otherParticipant.setBelarusianRuble(currentOtherParticipantBelarusianRuble);
-            otherParticipant.setDollar(currentOtherParticipantDollar);
-
-            logOperationResultMessage(LOGGER, true, dollar, convertedDollarToBelarusianRuble,
-                    name, otherParticipant.getName());
-
-            setBelarusianRuble(currentThisBelarusianRuble);
-            setDollar(new Dollar(0, 0));
-        } else {
-            logOperationResultMessage(LOGGER, false, dollar, convertedDollarToBelarusianRuble,
-                    name, otherParticipant.getName());
-        }
+        participant.setEuro(otherParticipantRealAmountOfEuro);
+        participant.setDollar(otherParticipantRealAmountOfDollars);
+        participant.setBelarusianRuble(otherParticipantRemainingAmountOfBelarusianRubles);
     }
 
     @Override
     public String toString() {
-        return "\nParticipant{" +
-                " name=" + name +
-                "\t\tbelarusianRuble=" + belarusianRuble +
-                ",\teuro=" + euro +
-                ",\tdollar=" + dollar +
-                "\t}\n";
-    }
-
-    private void logOperationResultMessage(org.apache.logging.log4j.Logger logger, boolean operationStatus, Money sourceMoney, Money convertedMoney,
-                                           String thisParticipantName, String otherParticipantName) {
-
-        if (operationStatus) {
-            logger.info("\n"
-                    + "Operation: " + sourceMoney + " --> " + convertedMoney + "\n"
-                    + "Members: " + thisParticipantName + " -- " + otherParticipantName + "\n"
-                    + "Status: accepted\n");
-        } else {
-            logger.info("\n"
-                    + "Operation: " + sourceMoney + " --> " + convertedMoney + "\n"
-                    + "Members: " + thisParticipantName + " -- " + otherParticipantName + "\n"
-                    + "Status: refused, because " + otherParticipantName + " does not have this amount\n");
-        }
+        return "Participant{" +
+                "name='" + name + '\'' +
+                ", belarusianRuble=" + belarusianRuble + " RUB"  +
+                ", euro=" + euro + " EUR"  +
+                ", dollar=" + dollar + " USD" +
+                '}';
     }
 }

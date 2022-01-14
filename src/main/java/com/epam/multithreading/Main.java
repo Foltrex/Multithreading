@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class Main {
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
@@ -30,17 +29,12 @@ public class Main {
                 executorService.execute(participant);
             }
 
-            for (int i = 0; i < participants.size(); ++i) {
-                System.out.println("\n" + participants + "\n");
-                TimeUnit.MILLISECONDS.sleep(800);
-            }
-
+            System.out.println(participants);
 
             executorService.shutdown();
 
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             LOGGER.warn(e.getMessage(), e);
         }
     }
-
 }
