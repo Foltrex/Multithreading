@@ -36,7 +36,7 @@ public class StockExchange {
         return localInstance;
     }
 
-    public void process(Participant newParticipant) throws InterruptedException {
+    public void register(Participant newParticipant) throws InterruptedException {
         try {
             semaphore.acquire();
             participantsLock.lock();

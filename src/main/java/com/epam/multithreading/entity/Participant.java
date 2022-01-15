@@ -67,7 +67,7 @@ public class Participant implements Runnable {
     public void run() {
         StockExchange stockExchange = StockExchange.getInstance();
         try {
-            stockExchange.process(this);
+            stockExchange.register(this);
 
         } catch (InterruptedException ex) {
             throw new RuntimeException("Can't exchange currency on stock exchange", ex);
