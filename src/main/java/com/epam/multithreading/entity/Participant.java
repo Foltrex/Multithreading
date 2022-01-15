@@ -3,10 +3,6 @@ package com.epam.multithreading.entity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 public class Participant implements Runnable {
     private static final Logger LOGGER = LogManager.getLogger(Participant.class);
 
