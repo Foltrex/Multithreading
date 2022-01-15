@@ -1,19 +1,19 @@
 package com.epam.multithreading.entity;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class StockExchange {
     private static StockExchange instance;
-    private final Queue<Participant> participants = new ArrayDeque<>();
+    private final List<Participant> participants = new ArrayList<>();
     private static final Lock LOCK = new ReentrantLock();
 
-    private static final int MAX_NUMBER_OF_PARTICIPANTS_TO_EXCHANGE = 4;
+    private static final int STOCK_EXCHANGE_PARTICIPANTS_CAPACITY = 4;
 
-    private final Semaphore semaphore = new Semaphore(MAX_NUMBER_OF_PARTICIPANTS_TO_EXCHANGE);
+    private final Semaphore semaphore = new Semaphore(STOCK_EXCHANGE_PARTICIPANTS_CAPACITY);
     private final Lock participantsLock = new ReentrantLock();
 
     private StockExchange() {}
@@ -37,9 +37,10 @@ public class StockExchange {
     }
 
     public void process(Participant newParticipant) throws InterruptedException {
-        semaphore.acquire();
-        participantsLock.lock();
         try {
+            semaphore.acquire();
+            participantsLock.lock();
+
             for (Participant participant: participants) {
                 newParticipant.exchangeCurrency(participant);
             }

@@ -74,7 +74,7 @@ public class Participant implements Runnable {
             stockExchange.process(this);
 
         } catch (InterruptedException ex) {
-            LOGGER.warn(ex.getMessage(), ex);
+            throw new RuntimeException("Can't exchange currency on stock exchange", ex);
         }
     }
 
@@ -96,6 +96,8 @@ public class Participant implements Runnable {
         if (isEnoughToBuyBelarusianRubles(participant, amountOfBuyingBelarusianRubles)) {
             buyBelarusianRubles(participant, amountOfBuyingBelarusianRubles);
         }
+
+        LOGGER.info(this.getName() + " exchanged currency with " + participant.getName());
     }
 
 

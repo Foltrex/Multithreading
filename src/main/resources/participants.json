@@ -1,43 +1,45 @@
-[
-  {
-    "name": "Artem",
-    "belarusianRuble": 920.65,
-    "euro": 317.40,
-    "dollar": 360.87
-  },
+{
+  "participants" : [
+    {
+      "name": "Artem",
+      "belarusianRuble": 920.65,
+      "euro": 317.40,
+      "dollar": 360.87
+    },
 
-  {
-    "name": "Maria",
-    "belarusianRuble": 921.28,
-    "euro": 318.34,
-    "dollar": 361.08
-  },
+    {
+      "name": "Maria",
+      "belarusianRuble": 921.28,
+      "euro": 318.34,
+      "dollar": 361.08
+    },
 
-  {
-    "name": "Nikolay",
-    "belarusianRuble": 922.53,
-    "euro": 319.22,
-    "dollar": 362.41
-  },
+    {
+      "name": "Nikolay",
+      "belarusianRuble": 922.53,
+      "euro": 319.22,
+      "dollar": 362.41
+    },
 
-  {
-    "name": "Ira",
-    "belarusianRuble": 923.65,
-    "euro": 320.00,
-    "dollar": 363.12
-  },
+    {
+      "name": "Ira",
+      "belarusianRuble": 923.65,
+      "euro": 320.00,
+      "dollar": 363.12
+    },
 
-  {
-    "name": "Sara",
-    "belarusianRuble": 920.06,
-    "euro": 317.04,
-    "dollar": 360.08
-  },
+    {
+      "name": "Sara",
+      "belarusianRuble": 920.06,
+      "euro": 317.04,
+      "dollar": 360.08
+    },
 
-  {
-    "name": "Dmitriy",
-    "belarusianRuble": 920.78,
-    "euro": 317.32,
-    "dollar": 360.87
-  }
-]
+    {
+      "name": "Dmitriy",
+      "belarusianRuble": 920.78,
+      "euro": 317.32,
+      "dollar": 360.87
+    }
+  ]
+}

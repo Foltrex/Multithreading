@@ -1,7 +1,7 @@
 package com.epam.multithreading;
 
 import com.epam.multithreading.entity.Participant;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.epam.multithreading.entity.Participants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,24 +17,20 @@ public class Main {
 
     private static final String PARTICIPANTS_PATH = "src/main/resources/participants.json";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            List<Participant> participants = objectMapper.readValue(new File(PARTICIPANTS_PATH),
-                    new TypeReference<List<Participant>>() {});
+        ObjectMapper objectMapper = new ObjectMapper();
 
-            ExecutorService executorService = Executors.newFixedThreadPool(participants.size());
-            for (Participant participant : participants) {
-                executorService.execute(participant);
-            }
+        Participants participantsWrapper = objectMapper.readValue(new File(PARTICIPANTS_PATH), Participants.class);
+        List<Participant> participants = participantsWrapper.getParticipants();
 
-            System.out.println(participants);
-
-            executorService.shutdown();
-
-        } catch (IOException e) {
-            LOGGER.warn(e.getMessage(), e);
+        ExecutorService executorService = Executors.newFixedThreadPool(participants.size());
+        for (Participant participant : participants) {
+            executorService.execute(participant);
         }
+
+        LOGGER.info(participants);
+
+        executorService.shutdown();
     }
 }
