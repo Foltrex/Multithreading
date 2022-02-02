@@ -7,6 +7,8 @@ public class Participant implements Runnable {
     private static final Logger LOGGER = LogManager.getLogger(Participant.class);
 
     private String name;
+
+    // the BigDecimal type is not used here to simplify the code (it was approved during the review)
     private double belarusianRuble;
     private double euro;
     private double dollar;
