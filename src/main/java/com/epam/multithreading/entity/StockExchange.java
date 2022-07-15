@@ -1,5 +1,7 @@
 package com.epam.multithreading.entity;
 
+import com.epam.multithreading.CurrencyExchanger;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -10,6 +12,7 @@ public class StockExchange {
     private static StockExchange instance;
     private final List<Participant> participants = new ArrayList<>();
     private static final Lock LOCK = new ReentrantLock();
+    private final CurrencyExchanger exchangeCurrency = new CurrencyExchanger();
 
     private static final int STOCK_EXCHANGE_PARTICIPANTS_CAPACITY = 4;
 
@@ -42,7 +45,7 @@ public class StockExchange {
             participantsLock.lock();
 
             for (Participant participant: participants) {
-                newParticipant.exchangeCurrency(participant);
+                exchangeCurrency.exchangeCurrency(newParticipant, participant);
             }
 
             participants.add(newParticipant);
